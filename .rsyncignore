@@ -1,0 +1,6 @@
+.well-known
+cgi-bin
+public
+tmp
+.htaccess
+stderr.log

@@ -1,0 +1,39 @@
+name: Deploy to cPanel
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: List build output
+        run: ls -al .output
+
+      - name: Deploy to cPanel via SSH
+        uses: easingthemes/ssh-deploy@v2.1.5
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY }}
+          SOURCE: ".output/"
+          REMOTE_HOST: brainversetechnologies.co.ke
+          REMOTE_USER: brainver
+          TARGET: "/home/brainver/nilltech.brainversetechnologies.co.ke"
+          ARGS: "-avz --delete --exclude-from='.rsyncignore'"
