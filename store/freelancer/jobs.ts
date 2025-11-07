@@ -15,6 +15,9 @@ export const useFreelancerJobsStore = defineStore("freelancerJobs", () => {
   const totalAvailableJobsCount = ref<number>(0);
   const totalMyApplicationsCount = ref<number>(0);
   const dashboardMetrics = ref();
+  const appliedJobs = ref<IFreelancerJobListing[]>([]);
+  const totalAppliedJobsCount = ref<number>(0);
+
 
   // Getters
   const hasAvailableJobs = computed(() => availableJobs.value.length > 0);
@@ -180,8 +183,8 @@ export const useFreelancerJobsStore = defineStore("freelancerJobs", () => {
         query: params,
       });
 
-      availableJobs.value = response.results;
-      totalAvailableJobsCount.value = response.count;
+      appliedJobs.value = response.results;
+      totalAppliedJobsCount.value = response.count;
 
       return response.results;
     } catch (error: any) {
@@ -356,6 +359,8 @@ export const useFreelancerJobsStore = defineStore("freelancerJobs", () => {
     bookmarkJob,
     removeBookmarkJob,
     fetchDashboardMetrics,
+    appliedJobs,
+    totalAppliedJobsCount,
     fetchAppliedJobsByFreelancer,
   };
 });
