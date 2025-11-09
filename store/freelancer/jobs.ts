@@ -15,6 +15,12 @@ export const useFreelancerJobsStore = defineStore("freelancerJobs", () => {
   const totalAvailableJobsCount = ref<number>(0);
   const totalMyApplicationsCount = ref<number>(0);
   const dashboardMetrics = ref();
+<<<<<<< HEAD
+=======
+  const appliedJobs = ref<IFreelancerJobListing[]>([]);
+  const totalAppliedJobsCount = ref<number>(0);
+
+>>>>>>> 738fcd1bf4dceb4cdb094aed3ef2838fb695f1ba
 
   // Getters
   const hasAvailableJobs = computed(() => availableJobs.value.length > 0);
@@ -159,6 +165,43 @@ export const useFreelancerJobsStore = defineStore("freelancerJobs", () => {
       isLoading.value = false;
     }
   }
+
+  /**
+ * Fetches all jobs the freelancer has applied to.
+ * Supports pagination and filtering.
+ */
+  async function fetchAppliedJobsByFreelancer(params?: {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    ordering?: string;
+    status?: string;
+  }) {
+    isLoading.value = true;
+    try {
+      const response = await $apiClient<
+        PaginatedResponse<IFreelancerJobListing>
+      >("/jobs/applied/by-freelancer/", {
+        method: "GET",
+        query: params,
+      });
+
+      appliedJobs.value = response.results;
+      totalAppliedJobsCount.value = response.count;
+
+      return response.results;
+    } catch (error: any) {
+      console.error("Failed to fetch applied jobs:", error);
+      appStore.showSnackBar({
+        type: "error",
+        message: "Failed to load applied jobs.",
+      });
+      return Promise.reject(error);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
 
   /**
    * Fetches a paginated list of the authenticated freelancer's own job applications.
@@ -319,6 +362,9 @@ export const useFreelancerJobsStore = defineStore("freelancerJobs", () => {
     bookmarkJob,
     removeBookmarkJob,
     fetchDashboardMetrics,
+    appliedJobs,
+    totalAppliedJobsCount,
+    fetchAppliedJobsByFreelancer,
   };
 });
 

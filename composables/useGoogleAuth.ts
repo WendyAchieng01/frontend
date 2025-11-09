@@ -20,28 +20,22 @@ export function useGoogleAuth(mode: "login" | "register", userType?: "client" | 
         }
 
         try {
-            let res;
-            if (mode === "register") {
-                // registration requires both token + user_type
-                res = await authStore.googleLogin(id_token, user_type);
-            } else {
-                // login requires only the token
-                res = await authStore.googleLogin(id_token);
-            }
+            // Unified function — backend handles login/signup automatically
+            const res = await authStore.googleAuth(id_token, mode === "register" ? user_type : undefined);
 
+            // Only one snackbar (store already shows it, so this is optional)
             appStore.showSnackBar({
-                message: `Signed ${mode === "login" ? "in" : "up"} with Google successfully!`,
+                message: res.is_new
+                    ? "Account created successfully with Google!"
+                    : "Logged in successfully with Google!",
                 type: "success",
             });
 
-            // Redirect based on user type
-            const finalType =
-                res?.user?.user_type || user_type || "client";
+            // Determine redirect target
+            const finalType = res?.user_type || user_type || res?.user?.user_type || "client";
 
             navigateTo(
-                finalType === "client"
-                    ? "/client/dashboard"
-                    : "/freelancer/dashboard"
+                finalType === "client" ? "/client/dashboard" : "/freelancer/dashboard"
             );
         } catch (err: any) {
             console.error("Google auth failed:", err);
@@ -64,20 +58,16 @@ export function useGoogleAuth(mode: "login" | "register", userType?: "client" | 
             (import.meta as any).env?.NUXT_GOOGLE_CLIENT_ID;
 
         if (!clientId) {
-            console.error(
-                "Missing Google client ID."
-            );
+            console.error("Missing Google client ID.");
             return;
         }
 
         if (!window.google?.accounts?.id) {
-            console.error(
-                "Google Identity Services SDK not available. "
-            );
+            console.error("Google Identity Services SDK not available.");
             return;
         }
 
-        // Initialize Google button
+        // Initialize Google Identity SDK
         window.google.accounts.id.initialize({
             client_id: clientId,
             callback: handleGoogleResponse,
@@ -89,17 +79,16 @@ export function useGoogleAuth(mode: "login" | "register", userType?: "client" | 
             return;
         }
 
-        
+        // Render button
         window.google.accounts.id.renderButton(target, {
-            theme: "outline",        
+            theme: "outline",
             size: "large",
             text: mode === "login" ? "signin_with" : "signup_with",
             shape: "rectangular",
-            width: "100%", 
+            width: "100%",
             logo_alignment: "left",
         });
-
     }
 
-    return { renderGoogleButton };
+    return { renderGoogleButton };  
 }

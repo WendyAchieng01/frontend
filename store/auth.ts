@@ -281,61 +281,55 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
-  async function googleLogin(idToken: string, userType: "client" | "freelancer") {
+  // inside your defineStore
+  async function googleAuth(idToken: string, userType?: "client" | "freelancer") {
     isLoading.value = true;
     try {
-      // Send token and user type to backend
+      // Prepare body (include userType only if provided)
+      const body: any = { id_token: idToken };
+      if (userType) body.user_type = userType;
+
       const response = await $apiClient<IAuthResponse>("/oauth2callback/", {
         method: "POST",
-        body: {
-          id_token: idToken,
-          user_type: userType,
-        },
+        body,
       });
 
       // Save tokens
       accessToken.value = response.access;
       refreshToken.value = response.refresh;
 
-      // Extract user info
-      let responseUser;
-      if (response.user.profile_data?.client_profile)
-        responseUser = response.user.profile_data.client_profile.profile.user;
-      else if (response.user.profile_data?.freelancer_profile)
-        responseUser =
-          response.user.profile_data.freelancer_profile.profile.user;
-      else responseUser = response.user.profile_data;
-
-      let profileURL;
-      if (response.user_type == "client")
-        profileURL =
-          response.user.profile_data.client_profile.profile.profile_pic;
-      else if (response.user_type == "freelancer")
-        profileURL =
-          response.user.profile_data.freelancer_profile.profile.profile_pic;
-
+      // Extract user data (simplified)
+      const responseUser = response.user;
       const config = useRuntimeConfig();
+
       user.value = {
         id: responseUser.id,
         email: responseUser.email,
         username: responseUser.username,
-        user_type: response.user_type,
-        full_name: `${responseUser.first_name} ${responseUser.last_name}`,
+        user_type: responseUser.user_type,
+        full_name: `${responseUser.first_name || ""} ${responseUser.last_name || ""}`.trim(),
         is_verified: true,
-        profile_photo_url: `${config.public.mediaBaseUrl}${profileURL}`,
+        profile_photo_url: responseUser.profile_photo
+          ? `${config.public.mediaBaseUrl}${responseUser.profile_photo}`
+          : null,
       };
+
+      // Choose message
+      const message = response.is_new
+        ? "Account created successfully with Google!"
+        : "Logged in successfully with Google!";
 
       appStore.showSnackBar({
         type: "success",
-        message: "Logged in successfully with Google!",
+        message,
       });
 
       return response;
     } catch (error: any) {
-      console.error("Google login failed:", error);
+      console.error("Google auth failed:", error);
       appStore.showSnackBar({
         type: "error",
-        message: "Google login failed. Please try again.",
+        message: "Google authentication failed. Please try again.",
       });
       throw error;
     } finally {
@@ -359,6 +353,6 @@ export const useAuthStore = defineStore("auth", () => {
     confirmPasswordReset,
     resendVerificationEmail,
     checkAuth,
-    googleLogin,
+    googleAuth,
   };
 });
