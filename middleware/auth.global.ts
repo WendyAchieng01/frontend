@@ -9,6 +9,8 @@ export default defineNuxtRouteMiddleware((to) => {
     "/about-us",
     "/frequently-asked-questions",
     "/.well-known/appspecific/com.chrome.devtools.json",
+    "/terms",
+    "/privacy-policy",
   ];
   const authOnlyRoutes = [
     "/auth/login",

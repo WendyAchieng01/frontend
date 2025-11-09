@@ -91,8 +91,8 @@
           </p>
           <p class="text-subtitle-1">
             All Rights Reserved |
-            <NuxtLink href="#">Terms and Conditions</NuxtLink> |
-            <NuxtLink href="#">Privacy Policy</NuxtLink>
+            <NuxtLink href="/terms">Terms and Conditions</NuxtLink> |
+            <NuxtLink href="/privacy-policy">Privacy Policy</NuxtLink>
           </p>
         </div>
       </v-row>
