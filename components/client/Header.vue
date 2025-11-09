@@ -28,35 +28,6 @@
 
         <!-- notifications and profile -->
         <div class="d-flex align-center ga-6">
-          <v-menu>
-            <template #activator="{ props }">
-              <v-badge color="error" content="0">
-                <v-icon
-                  v-bind="props"
-                  icon="mdi-bell-outline"
-                  size="x-large"
-                  color="primary"
-                />
-              </v-badge>
-            </template>
-            <v-card
-              title="Notifications"
-              subtitle="View your notifications"
-              width="400"
-            >
-              <v-list v-if="false" class="mb-3">
-                <v-list-item
-                  v-for="n in []"
-                  :key="n"
-                  prepend-icon="mdi-circle-small"
-                  title="Password Changed"
-                  subtitle="Your password has changed"
-                />
-              </v-list>
-              <p v-else class="ma-3 text-center">You're all caught up!</p>
-            </v-card>
-          </v-menu>
-
           <v-btn
             text="Post A Job"
             variant="outlined"

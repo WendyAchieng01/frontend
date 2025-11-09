@@ -48,37 +48,6 @@
         <div class="d-flex align-center ga-4">
           <v-menu>
             <template #activator="{ props }">
-              <v-badge color="primary" dot>
-                <v-icon
-                  v-bind="props"
-                  icon="mdi-bell-outline"
-                  size="x-large"
-                  color="primary"
-                />
-              </v-badge>
-            </template>
-            <v-card
-              title="Notifications"
-              subtitle="View your notifications"
-              width="400"
-            >
-              <v-list class="mb-3">
-                <v-list v-if="false" class="mb-3">
-                  <v-list-item
-                    v-for="n in []"
-                    :key="n"
-                    prepend-icon="mdi-circle-small"
-                    title="Password Changed"
-                    subtitle="Your password has changed"
-                  />
-                </v-list>
-                <p v-else class="ma-3 text-center">You're all caught up!</p>
-              </v-list>
-            </v-card>
-          </v-menu>
-
-          <v-menu>
-            <template #activator="{ props }">
               <v-avatar
                 v-if="authStore.user"
                 v-bind="props"
