@@ -2,7 +2,8 @@
   <div>
     <h1 class="text-h4 font-weight-medium">Create an account</h1>
 
-    <v-form class="mt-5" @submit.prevent="createAccount">
+    <!-- Step 1: Create Account Form -->
+    <v-form v-if="step === 'create'" class="mt-5" @submit.prevent="createAccount">
       <template #default>
         <v-text-field
           v-model="createForm.user.username"
@@ -73,8 +74,28 @@
       </template>
     </v-form>
 
+    <!-- Step 2: Edit Email & Resend Verification -->
+    <div v-else class="mt-5">
+      <h2 class="text-h5 font-weight-medium">Verify Your Email</h2>
+      <p>Please check your email for the verification link. If you do not find it in your inbox, kindly review your spam or junk folder. 
+        <br>Should the email address be incorrect, you may edit it below:</br></p>
+
+      <v-form @submit.prevent="resendVerification" class="mt-5">
+        <v-text-field
+          v-model="email"
+          label="Email Address"
+          type="email"
+          placeholder="Enter your email"
+          :rules="[required, emailFormat]"
+        />
+        <v-btn type="submit" color="primary" :loading="loading" class="mt-3">
+          Resend Verification Email
+        </v-btn>
+      </v-form>
+    </div>
+
     <!-- social auth -->
-    <v-row no-gutters class="mt-7">
+    <v-row no-gutters class="mt-7" v-if="step === 'create'">
       <div class="d-flex w-100 align-center ga-3">
         <v-divider />
         <p>Or</p>
@@ -82,8 +103,7 @@
       </div>
     </v-row>
 
-    <div class="mt-5" id="googleBtn" style="width: 100%;"></div>
-
+    <div class="mt-5" id="googleBtn" style="width: 100%;" v-if="step === 'create'"></div>
 
     <p class="text-subtitle-1 mt-5">
       Already have an account?
@@ -93,11 +113,12 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { useAuthStore } from "~/store/auth";
 import { useAppStore } from "~/store/app";
 import type { IRegisterPayload } from "~/types/auth";
-import { useGoogleAuth } from "~/composables/useGoogleAuth"
+import { useGoogleAuth } from "~/composables/useGoogleAuth";
+import axios from "axios";
 
 const { accountType } = defineProps<{
   accountType: "client" | "freelancer";
@@ -108,7 +129,11 @@ const authStore = useAuthStore();
 const appStore = useAppStore();
 const { renderGoogleButton } = useGoogleAuth("register", accountType);
 
-// form helpers (unchanged)
+const step = ref<'create'|'verify'>('create'); // Step tracker
+const email = ref('');
+const loading = ref(false);
+
+// Form helpers
 const {
   form: createForm,
   reset: resetCreateForm,
@@ -116,39 +141,32 @@ const {
   setErrors,
   clearErrors,
 } = useForm<IRegisterPayload>({
-  user: {
-    username: "",
-    email: "",
-    first_name: "",
-    last_name: "",
-  },
+  user: { username: "", email: "", first_name: "", last_name: "" },
   user_type: accountType,
   password: "",
   password_confirmation: "",
 });
+
+// Validation rules
+const required = (v: string) => !!v || "This field is required";
+const emailFormat = (v: string) => /\S+@\S+\.\S+/.test(v) || "Invalid email";
 
 async function createAccount() {
   clearErrors();
 
   try {
     await authStore.register({ ...createForm });
-
-    // On successful registration:
     appStore.showSnackBar({
-      message: "Account created successfully!",
+      message: "Account created successfully! Please verify your email.",
       type: "success",
     });
+    email.value = createForm.user.email;
     resetCreateForm();
-    navigateTo("/auth/login");
+    step.value = 'verify'; // Move to email edit/resend step
   } catch (error: any) {
-    console.error("Account creation error:", error);
-
     const backendErrors = error.response?._data;
-
     if (backendErrors) {
-      console.log(backendErrors);
       setErrors(backendErrors);
-
       const generalErrorMessage =
         backendErrors.detail ||
         backendErrors.non_field_errors?.[0] ||
@@ -163,9 +181,27 @@ async function createAccount() {
   }
 }
 
+async function resendVerification() {
+  if (!email.value) return;
+  loading.value = true;
+
+  try {
+    await axios.post("/auth/resend-verification/", { email: email.value });
+    appStore.showSnackBar({
+      message: "Verification email sent successfully!",
+      type: "success",
+    });
+  } catch (err: any) {
+    appStore.showSnackBar({
+      message: err.response?.data?.detail || "Failed to resend verification.",
+      type: "error",
+    });
+  } finally {
+    loading.value = false;
+  }
+}
+
 onMounted(() => {
   renderGoogleButton("googleBtn");
 });
-
 </script>
-

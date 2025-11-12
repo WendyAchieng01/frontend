@@ -16,6 +16,7 @@
     "@pinia/nuxt": "^0.11.0",
     "@vueuse/core": "^14.0.0",
     "@vueuse/nuxt": "^13.4.0",
+    "axios": "^1.13.2",
     "eslint": "^9.25.1",
     "lodash": "^4.17.21",
     "moment": "^2.30.1",
