@@ -52,12 +52,13 @@
             color="red"
             variant="outlined"
             :size="$vuetify.display.mobile ? 'default' : 'large'"
-             :width="$vuetify.display.mobile ? undefined : '150'"
+            :width="$vuetify.display.mobile ? undefined : '150'"
             :loading="withdrawing"
             @click="withdrawApplication"
           >
             Withdraw
           </v-btn>
+
         </div>
       </div>
 
@@ -104,6 +105,8 @@ import { useFreelancerJobsStore } from "~/store/freelancer/jobs";
 const props = defineProps<{ job: IFreelancerJobListing }>();
 const jobStore = useFreelancerJobsStore();
 
+const withdrawing = ref(false);
+
 // Bookmark handlers
 async function markBookMark() {
   await jobStore.bookmarkJob(props.job.slug);
@@ -112,17 +115,20 @@ async function removeBookMark() {
   await jobStore.removeBookmarkJob(props.job.slug);
 }
 
-// Withdraw applied job
-const withdrawing = ref(false);
-
 async function withdrawApplication() {
   if (!props.job.slug) return;
 
   try {
     withdrawing.value = true;
-    await jobStore.unapplyJob(props.job.slug);
+    await jobStore.withdrawApplication(props.job.slug);
+
+    //update UI immediately
+    props.job.has_applied = false;
+  } catch (error) {
+    console.log("Failed to withdraw application:", error);
   } finally {
     withdrawing.value = false;
   }
 }
+
 </script>

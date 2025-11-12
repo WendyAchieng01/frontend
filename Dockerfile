@@ -1,44 +1,52 @@
-# =========================================
-# Stage 1: Build the Nuxt.js Application
-# =========================================
-# Use a compatible Node.js version
-FROM node:20-alpine AS builder
+# ---------- Build stage ----------
+FROM node:22-slim AS builder
 
-# Set the working directory inside the container
+# Install system dependencies
+RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
+ENV NODE_ENV=development
 
-# Copy package-related files first to leverage Docker's caching mechanism
-COPY package.json package-lock.json ./
+# Copy package files first
+COPY package*.json ./
 
-# Update npm to the latest version
-RUN npm install -g npm@11.6.2
+# Clean, reproducible install
+RUN npm ci --prefer-offline --no-audit --progress=false || npm install --legacy-peer-deps
 
-# Install project dependencies
-RUN npm ci
-
-# Copy the rest of the application source code into the container
+# Copy project source
 COPY . .
 
-# Build the Nuxt.js application for production
-RUN npm run build
+# Load environment variables via build arguments
+# These will be passed during docker build
+ARG NUXT_PUBLIC_API_BASE_URL
+ARG NUXT_PUBLIC_MEDIA_BASE_URL
+ARG NUXT_GOOGLE_CLIENT_ID
+ARG NUXT_SESSION_PASSWORD
 
-# =========================================
-# Stage 2: Serve the Nuxt.js Application
-# =========================================
-# Use a lightweight Node.js image for serving
-FROM node:20-alpine
+# Set them as environment variables so Nuxt can see them
+ENV NUXT_PUBLIC_API_BASE_URL=$NUXT_PUBLIC_API_BASE_URL
+ENV NUXT_PUBLIC_MEDIA_BASE_URL=$NUXT_PUBLIC_MEDIA_BASE_URL
+ENV NUXT_GOOGLE_CLIENT_ID=$NUXT_GOOGLE_CLIENT_ID
+ENV NUXT_SESSION_PASSWORD=$NUXT_SESSION_PASSWORD
 
-# Set the working directory inside the container
+# Build Nuxt app (fresh build, ensures new code is used)
+RUN rm -rf .output && npm run build
+
+# ---------- Production stage ----------
+FROM node:22-slim AS runner
+
 WORKDIR /app
+ENV NODE_ENV=production
 
-# Copy the build output from the previous stage
-COPY --from=builder /app/.output .output
+# Create non-root user
+RUN useradd -m appuser
+USER appuser
 
-# Install a lightweight HTTP server (e.g., serve)
-RUN npm install -g serve
+# Copy built output & package metadata
+COPY --from=builder /app/.output ./.output
+COPY --from=builder /app/package*.json ./
 
-# Expose the port used by the server
 EXPOSE 3000
+ENV PORT=3000
 
-# Command to serve the application
-CMD ["serve", "-s", ".output"]
+CMD ["node", ".output/server/index.mjs"]

@@ -203,6 +203,47 @@ export const useFreelancerJobsStore = defineStore("freelancerJobs", () => {
     }
   }
 
+  /**
+ * Withdraws (unapplies) the freelancer's application for a specific job.
+ * Automatically uses the logged-in freelancer from appStore.
+ * @param jobSlug The slug of the job to withdraw application from.
+ */
+  async function withdrawApplication(jobSlug: string) {
+    isLoading.value = true;
+    try {
+      const response = await $apiClient(`/jobs/${jobSlug}/unapply/`, {
+        method: "DELETE",
+      });
+
+      appStore.showSnackBar({
+        type: "success",
+        message: "Application withdrawn successfully.",
+      });
+
+      //remove from local appliedJobs list
+      const appliedJobIndex = appliedJobs.value.findIndex(
+        (job) => job.slug === jobSlug
+      );
+      if (appliedJobIndex !== -1) {
+        appliedJobs.value.splice(appliedJobIndex, 1);
+        totalAppliedJobsCount.value -= 1;
+      }
+
+      return response;
+    } catch (error: any) {
+      console.error(`Failed to withdraw application for ${jobSlug}:`, error);
+      appStore.showSnackBar({
+        type: "error",
+        message: "Failed to withdraw your application.",
+      });
+      return Promise.reject(error);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+
+
 
   /**
    * Fetches a paginated list of the authenticated freelancer's own job applications.
@@ -366,6 +407,7 @@ export const useFreelancerJobsStore = defineStore("freelancerJobs", () => {
     appliedJobs,
     totalAppliedJobsCount,
     fetchAppliedJobsByFreelancer,
+    withdrawApplication,
   };
 });
 
