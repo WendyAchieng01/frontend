@@ -201,7 +201,15 @@ async function resendVerification() {
   }
 }
 
+// Wait for Google SDK
 onMounted(() => {
-  renderGoogleButton("googleBtn");
+  const initGoogle = () => {
+    if (window.google?.accounts?.id) {
+      renderGoogleButton("googleBtn");
+    } else {
+      setTimeout(initGoogle, 100);
+    }
+  };
+  initGoogle();
 });
 </script>

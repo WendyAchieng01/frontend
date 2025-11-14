@@ -15,7 +15,7 @@ export default defineNuxtConfig({
     public: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL,
       mediaBaseUrl: process.env.NUXT_PUBLIC_MEDIA_BASE_URL,
-      googleClientId: process.env.NUXT_GOOGLE_CLIENT_ID,
+      googleClientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID,
     },
   },
   app: {
