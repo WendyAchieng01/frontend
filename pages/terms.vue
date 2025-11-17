@@ -116,7 +116,7 @@
           <li>These Terms, together with the <NuxtLink to="/privacy-policy" class="text-primary">Privacy Policy</NuxtLink>, form the entire agreement.</li>
           <li>Invalid provisions do not affect the rest.</li>
           <li>No waiver of rights constitutes a waiver of any other right.</li>
-          <li>Contact us at <a href="mailto:contact@nilltechsolutions.com" class="text-primary">contact@nilltechsolutions.com</a>.</li>
+          <li>Contact us at <a href="mailto:info@nilltechsolutions.com" class="text-primary">info@nilltechsolutions.com</a>.</li>
         </ul>
       </div>
 

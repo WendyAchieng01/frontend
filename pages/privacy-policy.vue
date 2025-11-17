@@ -17,8 +17,8 @@
         </li>
         <li class="mb-3">
           <strong>Data Subject Rights:</strong> Access, rectify, erase, or object to processing
-          via <a href="mailto:contact@nilltechsolutions.com" class="text-primary">
-          contact@nilltechsolutions.com</a>. We respond within 14 days per DPA.
+          via <a href="mailto:info@nilltechsolutions.com" class="text-primary">
+          info@nilltechsolutions.com</a>. We respond within 14 days per DPA.
         </li>
         <li class="mb-3">
           <strong>Security:</strong> We use encryption and access controls; report breaches
