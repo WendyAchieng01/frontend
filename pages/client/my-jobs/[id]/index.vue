@@ -138,6 +138,7 @@ import { useClientJobsStore } from "~/store/client/jobs";
 import { useAppStore } from "~/store/app";
 import { useRouter, useRoute } from "vue-router";
 
+
 definePageMeta({
   layout: "client",
 });
@@ -148,6 +149,8 @@ const addFundsDialog = ref(false);
 
 const clientJobStore = useClientJobsStore();
 const appStore = useAppStore();
+const { $apiClient } = useNuxtApp();
+
 
 onMounted(async () => {
   await clientJobStore.fetchJobDetails(route.params.id as string);
@@ -172,7 +175,7 @@ watch(
           message,
         });
 
-      // Backend call for payment status update
+      // Make call to backend - I also do not know why, the backend kinda depends on it
       $apiClient(
         `/jobs/${route.params.id}/?success=${success}&message=${message}`
       );

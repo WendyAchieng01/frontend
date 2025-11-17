@@ -1,42 +1,41 @@
-# ---------- Build stage ----------
+# ---------- Build Stage: Compile Nuxt App ----------
 FROM node:22-slim AS builder
-
-# Install build tools
-RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 ENV NODE_ENV=development
 
-# Copy dependency manifests
-COPY package*.json ./
+RUN apt-get update && apt-get install -y python3 make g++ \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies cleanly
+COPY package*.json ./
 RUN npm ci --prefer-offline --no-audit --progress=false || npm install --legacy-peer-deps
 
-# Copy project source
 COPY . .
+RUN npm run build
 
-# Build Nuxt without hardcoding env vars
-# This ensures runtime envs from Render can override during container start
-RUN rm -rf .output && npm run build
-
-# ---------- Production stage ----------
+# ---------- Runner Stage: Combine Nuxt runtime and Nginx server in one image ----------
 FROM node:22-slim AS runner
 
 WORKDIR /app
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=3001
 
-# Create non-root user for security
-RUN useradd -m appuser
-USER appuser
+# Install Nginx and production dependencies, clean up after
+RUN apt-get update && apt-get install -y nginx curl \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Copy only built output and package files
+# Copy built output and package files from the builder stage
 COPY --from=builder /app/.output ./.output
 COPY --from=builder /app/package*.json ./
 
-# Expose port
-EXPOSE 3000
+# Install only production dependencies for Nuxt runtime
+RUN npm install --omit=dev
 
-# Start the Nuxt app
-CMD ["node", ".output/server/index.mjs"]
+# Replace the default Nginx configuration file with your custom one
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Expose port 80 for Nginx
+EXPOSE 80
+
+# The container will run as root (default), avoiding all permission errors
+CMD ["sh", "-c", "nginx && node .output/server/index.mjs"]

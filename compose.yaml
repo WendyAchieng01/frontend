@@ -1,18 +1,19 @@
 version: "3.9"
 
 services:
-  nuxt:
+  nuxt-nginx:
     build:
       context: .
       dockerfile: Dockerfile
     environment:
       NODE_ENV: production
-      PORT: 3000
-
-      # runtime environment variables
+      # Nginx handles port 80 externally, so we configure internal variables here
+      PORT: 3001 
       NUXT_PUBLIC_API_BASE_URL: ${NUXT_PUBLIC_API_BASE_URL}
       NUXT_PUBLIC_GOOGLE_CLIENT_ID: ${NUXT_PUBLIC_GOOGLE_CLIENT_ID}
       NUXT_SESSION_PASSWORD: ${NUXT_SESSION_PASSWORD}
       NUXT_PUBLIC_MEDIA_BASE_URL: ${NUXT_PUBLIC_MEDIA_BASE_URL}
     ports:
-      - "3000:3000"
+      # Map host port 80 to container port 80
+      - "80:80" 
+    restart: unless-stopped
