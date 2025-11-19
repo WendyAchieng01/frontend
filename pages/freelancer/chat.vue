@@ -24,7 +24,19 @@
             >
               <template #prepend>
                 <v-badge dot location="bottom end" color="success" bordered>
-                  <v-avatar :image="profileImage(chat.client, '')" size="40" />
+                  <v-avatar size="40">
+                    <template v-if="chat.client_profile_pic">
+                      <img
+                        :src="chat.client_profile_pic"
+                        style="width: 100%; height: 100%; object-fit: cover;"
+                      />
+                    </template>
+
+                    <template v-else>
+                      {{ getInitials(chat.client) }}
+                    </template>
+                  </v-avatar>
+
                 </v-badge>
               </template>
 
@@ -68,7 +80,19 @@
         <!-- Header -->
         <div class="d-flex align-center pa-3 bg-white border-b">
           <v-badge :model-value="selectedChat.active" dot location="bottom end" color="success" bordered>
-            <v-avatar :image="profileImage(selectedChat.client, '')" size="45" />
+            <v-avatar size="x-large">
+              <template v-if="selectedChat.client_profile_pic">
+                <img
+                  :src="selectedChat.client_profile_pic"
+                  style="width: 100%; height: 100%; object-fit: cover;"
+                />
+              </template>
+
+              <template v-else>
+                {{ getInitials(selectedChat.client) }}
+              </template>
+            </v-avatar>
+
           </v-badge>
           <div class="ml-3">
             <p class="text-subtitle-1 font-weight-medium">{{ selectedChat.client }}</p>
@@ -252,6 +276,13 @@ function getLatestMessageTime(chat: IChat) {
 
 function getLatestMessage(chat: IChat) {
   return chat.messages[chat.messages.length - 1];
+}
+
+function getInitials(name: string): string {
+  if (!name) return "?";
+  const parts = name.split(" ");
+  const initials = parts.map(p => p[0]?.toUpperCase()).join("");
+  return initials.slice(0, 2); // max 2 letters
 }
 </script>
 

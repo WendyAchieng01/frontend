@@ -52,7 +52,21 @@
                     offset-y="4"
                     bordered
                   >
-                    <v-avatar :image="profileImage(chat.freelancer, '')" />
+                    <v-avatar size="40">
+                      <template v-if="chat.freelancer_profile_pic">
+                        <img
+                          :src="chat.freelancer_profile_pic"
+                          style="width: 100%; height: 100%; object-fit: cover;"
+                        />
+                      </template>
+
+                      <template v-else>
+                        {{ getInitials(chat.freelancer) }}
+                      </template>
+                    </v-avatar>
+
+
+
                   </v-badge>
                 </template>
                 <template #append>
@@ -97,10 +111,19 @@
                 offset-y="10"
                 bordered
               >
-                <v-avatar
-                  :image="profileImage(selectedChat.freelancer, '')"
-                  size="x-large"
-                />
+                <v-avatar size="x-large">
+                  <template v-if="selectedChat.freelancer_profile_pic">
+                    <img
+                      :src="selectedChat.freelancer_profile_pic"
+                      style="width: 100%; height: 100%; object-fit: cover;"
+                    />
+                  </template>
+
+                  <template v-else>
+                    {{ getInitials(selectedChat.freelancer) }}
+                  </template>
+                </v-avatar>
+
               </v-badge>
             </template>
           </v-list-item>
@@ -242,6 +265,7 @@ const page = ref(1);
 const route = useRoute();
 const freelancerUsername = route.query?.freelancer;
 
+
 onMounted(async () => {
   await chatStore.fetchChats({ page: page.value }).then((chats) => {
     if (freelancerUsername) {
@@ -316,10 +340,19 @@ function getLatestMessageTime(chat: IChat) {
 function getLatestMessage(chat: IChat) {
   return chat.messages[chat.messages.length - 1];
 }
+
+function getInitials(name: string): string {
+  if (!name) return "?";
+  const parts = name.split(" ");
+  const initials = parts.map(p => p[0]?.toUpperCase()).join("");
+  return initials.slice(0, 2); // max 2 letters
+}
+
 </script>
 
 <style scoped>
 .bg-grey-lighten-3 {
   background-color: #f1f1f1 !important;
 }
+
 </style>

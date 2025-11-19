@@ -35,6 +35,6 @@
 
 <script setup lang="ts">
 definePageMeta({
-  layout: "default", // ✅ ensures it uses the normal site layout
+  layout: "default",
 });
 </script>
