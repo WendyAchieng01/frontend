@@ -152,6 +152,18 @@ export interface IFreelancerWalletTransaction {
   net_earning: number;
 }
 
+export interface IContactFormData {
+  name: string
+  email: string
+  phone: string
+  subject: string
+  message: string
+  contact_type: "general" | "support" | "sales" | string
+  attachment?: string
+
+}
+
+
 // Freelancer Reviews (Received) Types
 export type IFreelancerReceivedReview = IReview;
 export type IFreelancerReviewClientPayload = IReviewCreatePayload;

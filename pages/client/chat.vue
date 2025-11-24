@@ -355,4 +355,8 @@ function getInitials(name: string): string {
   background-color: #f1f1f1 !important;
 }
 
+<<<<<<< HEAD
 </style>
+=======
+</style>
+>>>>>>> 206ed99522100cb8e70531d040fdbde43fcc6a30
