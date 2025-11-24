@@ -7,7 +7,7 @@
         <v-col cols="12" md="5">
           <v-card style="background-color: #527e91" rounded="lg" theme="dark">
             <template #text>
-              <form :action="backendRoute" method="POST" @submit.prevent="handleSubmit">
+              <form @submit.prevent="submit">
 
                 <v-text-field
                   v-model="form.name"
@@ -17,7 +17,6 @@
                   color="white"
                   hide-details="auto"
                   style="background-color:#064263"
-                  name="name"
                 />
 
                 <v-text-field
@@ -28,7 +27,6 @@
                   color="white"
                   hide-details="auto"
                   style="background-color:#064263"
-                  name="phone"
                 />
 
                 <v-text-field
@@ -39,11 +37,10 @@
                   color="white"
                   hide-details="auto"
                   style="background-color:#064263"
-                  name="email"
                 />
 
                 <v-select
-                  v-model="form.reason"
+                  v-model="form.subject"
                   :items="reasonOptions"
                   label="Reason for Contact"
                   variant="filled"
@@ -51,7 +48,6 @@
                   color="white"
                   hide-details="auto"
                   style="background-color:#064263"
-                  name="reason"
                 />
 
                 <v-textarea
@@ -62,7 +58,6 @@
                   color="white"
                   hide-details="auto"
                   style="background-color:#064263"
-                  name="message"
                 />
 
                 <v-btn
@@ -93,57 +88,61 @@
     <v-snackbar
       v-model="successSnackbar"
       color="green"
-      timeout="3000"
+      timeout="1000"
       location="bottom"
     >
-      Message sent successfully!
+      Message sent successfully! Please check your email for our response, including your spam folder.
     </v-snackbar>
   </v-sheet>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      backendRoute: "/contact/submit/",
+<script setup lang="ts">
+import { reactive,ref } from "vue";
+import { useContactStore } from "~/store/contact";
+import type { IContactFormPayload } from "~/types/freelancer";
 
-      form: {
-        name: "",
-        email: "",
-        phone: "",
-        message: "",
-        reason: ""
-      },
 
-      reasonOptions: [
-        "General Inquiry",
-        "Technical Issue",
-        "Billing Issue",
-        "Partnership Request",
-        "Account Support",
-        "Feature Request",
-        "Report a Bug",
-        "Other"
-      ],
+const contactStore = useContactStore();
+const successSnackbar = ref(false);
 
-      successSnackbar: false,
-    };
-  },
+const reasonOptions = [
+  "General Inquiry",
+  "Support",
+  "Business Inquiry",
+  "Feedback",
+  "Technical Issue",
+  "Billing Issue",
+  "Partnership Request",
+  "Account Support",
+  "Feature Request",
+  "Report a Bug",
+  "Other"
+];
 
-  methods: {
-    handleSubmit() {
-      // simulate success — replace with real backend call when ready
-      this.successSnackbar = true;
+const form = reactive<IContactFormPayload>({
+  name: "",
+  email: "",
+  phone: "",
+  subject: "",
+  message: "",
+  contact_type: "general",
+});
 
-      // clear form after submit
-      this.form = {
-        name: "",
-        email: "",
-        phone: "",
-        message: "",
-        reason: "",
-      };
-    }
+async function submit() {
+  try {
+    form.contact_type = "general"; 
+    await contactStore.submitContactForm(form);
+    successSnackbar.value = true;
+
+    // Clear form
+    form.name = "";
+    form.email = "";
+    form.phone = "";
+    form.subject = "";
+    form.message = "";
+
+  } catch (error) {
+    console.error(error);
   }
-};
+}
 </script>
