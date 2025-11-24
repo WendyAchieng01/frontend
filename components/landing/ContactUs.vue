@@ -88,7 +88,7 @@
     <v-snackbar
       v-model="successSnackbar"
       color="green"
-      timeout="1000"
+      timeout="3000"
       location="bottom"
     >
       Message sent successfully!
