@@ -7,13 +7,16 @@
         <v-col cols="12" md="5">
           <v-card style="background-color: #527e91" rounded="lg" theme="dark">
             <template #text>
-              <v-form>
+              <form @submit.prevent="submit">
+
                 <v-text-field
                   v-model="form.name"
                   label="Full Name"
                   variant="filled"
                   class="rounded"
                   color="white"
+                  hide-details="auto"
+                  style="background-color:#064263"
                 />
 
                 <v-text-field
@@ -22,6 +25,8 @@
                   variant="filled"
                   class="rounded mt-5"
                   color="white"
+                  hide-details="auto"
+                  style="background-color:#064263"
                 />
 
                 <v-text-field
@@ -31,8 +36,18 @@
                   class="rounded mt-5"
                   color="white"
                   hide-details="auto"
+                  style="background-color:#064263"
+                />
+
+                <v-select
+                  v-model="form.subject"
+                  :items="reasonOptions"
+                  label="Reason for Contact"
+                  variant="filled"
                   class="rounded mt-5"
                   color="white"
+                  hide-details="auto"
+                  style="background-color:#064263"
                 />
 
                 <v-textarea
@@ -41,6 +56,8 @@
                   variant="filled"
                   class="rounded mt-5"
                   color="white"
+                  hide-details="auto"
+                  style="background-color:#064263"
                 />
 
                 <v-btn
@@ -66,5 +83,60 @@
         </v-col>
       </v-row>
     </div>
+
+    <!-- SUCCESS SNACKBAR -->
+    <v-snackbar
+      v-model="successSnackbar"
+      color="green"
+      timeout="1000"
+      location="bottom"
+    >
+      Message sent successfully!
+    </v-snackbar>
   </v-sheet>
 </template>
+
+<script setup lang="ts">
+import { reactive,ref } from "vue";
+import { useContactStore } from "~/store/contact";
+import type { IContactFormPayload } from "~/types/freelancer";
+
+
+const contactStore = useContactStore();
+const successSnackbar = ref(false);
+
+const reasonOptions = [
+  "General Inquiry",
+  "Support",
+  "Business Inquiry",
+  "Feedback",
+  "Billing",
+];
+
+const form = reactive<IContactFormPayload>({
+  name: "",
+  email: "",
+  phone: "",
+  subject: "",
+  message: "",
+  contact_type: "general",
+});
+
+async function submit() {
+  try {
+    form.contact_type = "general"; 
+    await contactStore.submitContactForm(form);
+    successSnackbar.value = true;
+
+    // Clear form
+    form.name = "";
+    form.email = "";
+    form.phone = "";
+    form.subject = "";
+    form.message = "";
+
+  } catch (error) {
+    console.error(error);
+  }
+}
+</script>

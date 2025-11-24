@@ -26,11 +26,7 @@ export interface IChat {
   active: true;
   created_at: string;
   client_profile_pic: string;
-<<<<<<< HEAD
-  freelancer_profile_pic: string;
-=======
   freelancer_profile_pic:string;
->>>>>>> 206ed99522100cb8e70531d040fdbde43fcc6a30
   messages: IMessage[];
 }
 
