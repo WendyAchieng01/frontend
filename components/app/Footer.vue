@@ -59,8 +59,8 @@
 
           <p class="text-subtitle-1 mt-7">
             <v-icon icon="mdi-email-outline" />
-            <a class="text-decoration-none" href="mailto:contact@company.com">
-              contact@nilltechsolutions.com
+            <a class="text-decoration-none" href="mailto:info@nilltechsolutions.com">
+              info@nilltechsolutions.com
             </a>
           </p>
           <p class="text-subtitle-1 mt-2">
