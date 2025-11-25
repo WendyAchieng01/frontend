@@ -67,7 +67,11 @@
                   variant="elevated"
                   class="text-subtitle-1 mt-5"
                   block
-                />
+                  :loading="contactStore.isLoading"
+                  :disabled="contactStore.isLoading"
+                >
+                </v-btn>
+
               </form>
             </template>
           </v-card>
@@ -124,19 +128,24 @@ const form = reactive<IContactFormPayload>({
 
 async function submit() {
   try {
-    form.contact_type = "general"; 
-    await contactStore.submitContactForm(form);
-    successSnackbar.value = true;
+    form.contact_type = "general";
 
-    // Clear form
+ 
+    const backup = { ...form }; 
+
     form.name = "";
     form.email = "";
     form.phone = "";
     form.subject = "";
     form.message = "";
 
+    await contactStore.submitContactForm(backup);
+
+    successSnackbar.value = true;
+
   } catch (error) {
     console.error(error);
   }
 }
+
 </script>
