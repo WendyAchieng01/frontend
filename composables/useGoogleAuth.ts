@@ -66,7 +66,7 @@ export function useGoogleAuth(mode: "login" | "register", userType?: "client" | 
             return;
         }
 
-        // Poll until Google SDK is loaded (common fix for timing issues)
+        // Poll until Google SDK is loaded
         const interval = setInterval(() => {
             if (window.google?.accounts?.id) {
                 clearInterval(interval);
@@ -87,7 +87,7 @@ export function useGoogleAuth(mode: "login" | "register", userType?: "client" | 
             }
         }, 100); // Check every 100ms, stops automatically when ready
 
-        // Optional: timeout after 10s to avoid infinite loop
+        // timeout after 10s to avoid infinite loop
         setTimeout(() => clearInterval(interval), 10000);
     }
 
