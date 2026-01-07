@@ -53,23 +53,12 @@ export function useGoogleAuth(mode: "login" | "register", userType?: "client" | 
 
     function renderGoogleButton(targetId: string) {
         const config = useRuntimeConfig();
-
         const clientId = config.public.googleClientId;
 
         if (!clientId) {
-            console.error("Missing Google client ID. Check NUXT_PUBLIC_GOOGLE_CLIENT_ID");
+            console.error("Missing Google client ID");
             return;
         }
-
-        if (!window.google?.accounts?.id) {
-            console.error("Google Identity Services SDK not loaded yet.");
-            return;
-        }
-
-        window.google.accounts.id.initialize({
-            client_id: clientId,
-            callback: handleGoogleResponse,
-        });
 
         const target = document.getElementById(targetId);
         if (!target) {
@@ -77,15 +66,29 @@ export function useGoogleAuth(mode: "login" | "register", userType?: "client" | 
             return;
         }
 
-        // Render button
-        window.google.accounts.id.renderButton(target, {
-            theme: "outline",
-            size: "large",
-            text: mode === "login" ? "signin_with" : "signup_with",
-            shape: "rectangular",
-            width: "100%",
-            logo_alignment: "left",
-        });
+        // Poll until Google SDK is loaded (common fix for timing issues)
+        const interval = setInterval(() => {
+            if (window.google?.accounts?.id) {
+                clearInterval(interval);
+
+                window.google.accounts.id.initialize({
+                    client_id: clientId,
+                    callback: handleGoogleResponse,
+                });
+
+                window.google.accounts.id.renderButton(target, {
+                    theme: "outline",
+                    size: "large",
+                    text: mode === "login" ? "signin_with" : "signup_with",
+                    shape: "rectangular",
+                    width: "100%",
+                    logo_alignment: "left",
+                });
+            }
+        }, 100); // Check every 100ms, stops automatically when ready
+
+        // Optional: timeout after 10s to avoid infinite loop
+        setTimeout(() => clearInterval(interval), 10000);
     }
 
     return { renderGoogleButton };  
