@@ -13,9 +13,9 @@
           <v-select
             v-model="jobForm.category"
             label="Category"
-            :items="jobCategories"
+            :items="metaStore.categories"
             item-title="text"
-            item-value="text"
+            item-value="value"
             :rules="[required]"
             :error-messages="jobFormErrors.category"
           />
@@ -53,17 +53,18 @@
             item-value="value"
             :error-messages="jobFormErrors.preferred_freelancer_level"
           />
+          
           <v-select
-            v-model="jobForm.skills_required"
-            label="Skills Required"
-            :items="skills"
-            item-title="text"
-            item-value="text"
-            :error-messages="jobFormErrors.skills_required"
-            multiple
-            chips
-            closable-chips
-          />
+          v-model="jobForm.skills_required"
+          label="Skills Required"
+          :items="metaStore.skills"
+          item-title="text"
+          item-value="value"
+          :error-messages="jobFormErrors.skills_required"
+          multiple
+          chips
+          closable-chips
+        />
 
           <p class="text-subtitle-1 mt-4 mb-2">Description & Responsibility</p>
           <v-textarea
@@ -152,6 +153,7 @@ import { useClientTrainingsStore } from "~/store/client/training";
 import { useAppStore } from "~/store/app";
 import { useCommonSkillsStore } from "~/store/common/skills";
 import { useForm } from "~/composables/useForm";
+import { useMetaStore } from "~/store/client/meta";
 import type {
   IJobCreatePayload,
   ITrainingCreatePayload,
@@ -167,6 +169,12 @@ const skillStore = useCommonSkillsStore();
 
 onMounted(async () => {
   await skillStore.fetchAllSkills();
+});
+
+const metaStore = useMetaStore();
+
+onMounted(async () => {
+  await metaStore.fetchMeta();
 });
 
 // ------------------------------------
@@ -220,22 +228,7 @@ const isFutureDate = (value: string) => {
   return inputDate >= today || "Date must be in the future or today";
 };
 
-// ------------------------------------
-// Static Data for Selects
-// ------------------------------------
-const jobCategories: Array<{ text: string; value: JobCategory }> = [
-  { text: "Data Entry", value: "data_entry" },
-  { text: "Translation", value: "translation" },
-  { text: "Transcription and Captioning", value: "transcription" },
-  { text: "Graphics", value: "graphics" },
-  { text: "Writing and Editing", value: "writing" },
-  { text: "App and Web Development", value: "web_dev" },
-  { text: "IT Project Management", value: "project_mgmt" },
-  { text: "Software Testing", value: "testing" },
-  { text: "Virtual Assistance", value: "virtual_assist" },
-  { text: "Social Media Management", value: "social_media" },
-  { text: "AI Model Training", value: "ai_training" },
-];
+
 
 const preferredLevels: Array<{
   text: string;
@@ -244,93 +237,6 @@ const preferredLevels: Array<{
   { text: "Entry Level", value: "entry" },
   { text: "Intermediate", value: "intermediate" },
   { text: "Expert", value: "expert" },
-];
-
-const skills: Array<{
-  text: string;
-  value: string;
-}> = [
-  { text: "Python", value: "python" },
-  { text: "Javascript", value: "javascript" },
-  { text: "Java", value: "java" },
-  { text: "C#", value: "csharp" },
-  { text: "C++", value: "cpp" },
-  { text: "PHP", value: "php" },
-  { text: "Ruby", value: "ruby" },
-  { text: "Swift", value: "swift" },
-  { text: "Kotlin", value: "kotlin" },
-  { text: "Go", value: "go" },
-  { text: "Rust", value: "rust" },
-  { text: "TypeScript", value: "typescript" },
-  { text: "HTML", value: "html" },
-  { text: "CSS", value: "css" },
-  { text: "React", value: "react" },
-  { text: "Angular", value: "angular" },
-  { text: "Vue", value: "vue" },
-  { text: "Django", value: "django" },
-  { text: "Flask", value: "flask" },
-  { text: "Node.js", value: "nodejs" },
-  { text: "Express", value: "express" },
-  { text: "Spring", value: "spring" },
-  { text: "Laravel", value: "laravel" },
-  { text: "ASP.NET", value: "aspnet" },
-  { text: "jQuery", value: "jquery" },
-  { text: "Bootstrap", value: "bootstrap" },
-  { text: "Tailwind CSS", value: "tailwind" },
-  { text: "Android", value: "android" },
-  { text: "iOS", value: "ios" },
-  { text: "Flutter", value: "flutter" },
-  { text: "React Native", value: "reactnative" },
-  { text: "Xamarin", value: "xamarin" },
-  { text: "SQL", value: "sql" },
-  { text: "MySQL", value: "mysql" },
-  { text: "PostgreSQL", value: "postgresql" },
-  { text: "MongoDB", value: "mongodb" },
-  { text: "Oracle", value: "oracle" },
-  { text: "Firebase", value: "firebase" },
-  { text: "Redis", value: "redis" },
-  { text: "AWS", value: "aws" },
-  { text: "Azure", value: "azure" },
-  { text: "GCP", value: "gcp" },
-  { text: "Docker", value: "docker" },
-  { text: "Kubernetes", value: "kubernetes" },
-  { text: "Jenkins", value: "jenkins" },
-  { text: "GitOps", value: "gitops" },
-  { text: "Terraform", value: "terraform" },
-  { text: "Ansible", value: "ansible" },
-  { text: "Python (Data)", value: "python_data" },
-  { text: "R", value: "r" },
-  { text: "Machine Learning", value: "machine_learning" },
-  { text: "Deep Learning", value: "deep_learning" },
-  { text: "TensorFlow", value: "tensorflow" },
-  { text: "PyTorch", value: "pytorch" },
-  { text: "Pandas", value: "pandas" },
-  { text: "NumPy", value: "numpy" },
-  { text: "Scikit-learn", value: "scikit" },
-  { text: "NLP", value: "nlp" },
-  { text: "Computer Vision", value: "computer_vision" },
-  { text: "UI/UX", value: "uiux" },
-  { text: "Graphic Design", value: "graphic_design" },
-  { text: "Figma", value: "figma" },
-  { text: "Adobe XD", value: "adobe_xd" },
-  { text: "Sketch", value: "sketch" },
-  { text: "Photoshop", value: "photoshop" },
-  { text: "Illustrator", value: "illustrator" },
-  { text: "Agile", value: "agile" },
-  { text: "Scrum", value: "scrum" },
-  { text: "Kanban", value: "kanban" },
-  { text: "Jira", value: "jira" },
-  { text: "Confluence", value: "confluence" },
-  { text: "Trello", value: "trello" },
-  { text: "Asana", value: "asana" },
-  { text: "Git", value: "git" },
-  { text: "Testing", value: "testing" },
-  { text: "DevOps", value: "devops" },
-  { text: "Cybersecurity", value: "cybersecurity" },
-  { text: "Blockchain", value: "blockchain" },
-  { text: "SEO", value: "seo" },
-  { text: "Data Analysis", value: "data_analysis" },
-  { text: "Technical Writing", value: "technical_writing" },
 ];
 
 // ------------------------------------
