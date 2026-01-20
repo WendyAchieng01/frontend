@@ -1,0 +1,26 @@
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
+deploy.zip
+
+# Node dependencies
+node_modules
+
+# Logs
+logs
+*.log
+
+# Misc
+.DS_Store
+.fleet
+.idea
+
+# Local env files
+.env
+.env.*
+!.env.example
+Dockerfile
+mytests.txt

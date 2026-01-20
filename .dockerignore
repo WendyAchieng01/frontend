@@ -1,0 +1,10 @@
+.git
+.gitignore
+.vscode
+node_modules
+npm-debug.log
+**/.cache
+**/build
+**/dist
+LICENSE
+README.md

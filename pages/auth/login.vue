@@ -87,7 +87,6 @@ import { useAuthStore } from "~/store/auth";
 import type { ILoginPayload } from "~/types/auth";
 import { useGoogleAuth } from "~/composables/useGoogleAuth";
 
-
 definePageMeta({
   layout: "auth",
 });
@@ -107,6 +106,8 @@ const {
   password: "",
   remember_me: false,
 });
+
+
 
 async function loginUser() {
   clearErrors();
@@ -146,14 +147,9 @@ async function loginUser() {
 const { renderGoogleButton } = useGoogleAuth("login");
 
 onMounted(() => {
-  const initGoogle = () => {
-    if (window.google?.accounts?.id) {
-      renderGoogleButton("googleLoginBtn");
-    } else {
-      setTimeout(initGoogle, 100);
-    }
-  };
-  initGoogle();
+  renderGoogleButton("googleLoginBtn");
 });
+
+
 
 </script>
