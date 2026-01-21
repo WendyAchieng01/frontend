@@ -6,7 +6,7 @@
   </p>
   <v-row class="mt-5" justify="space-between">
     <v-col cols="12" md="5">
-      <v-img src="/images/for_freelancers.jpg" class="rounded-lg" />
+      <v-img src="/images/for_client.jpg" class="rounded-lg" />
     </v-col>
     <v-col cols="12" md="6">
       <p class="text-h4 text-sm-h3 text-capitalize font-weight-light">
