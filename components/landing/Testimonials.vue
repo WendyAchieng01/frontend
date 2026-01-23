@@ -5,19 +5,16 @@
   </p>
   <v-row class="mt-5">
     <v-col v-for="(testimonial, index) in testimonials" :key="index" cols="12" md="6">
-      <v-sheet rounded="lg" style="background-color: #efefef" height="300">
+      <v-sheet rounded="lg" style="background-color: #efefef" class="h-auto">
         <v-row class="fill-height">
-          <v-col cols="5" class="fill-height pa-0">
-            <div class="d-flex flex-column justify-end h-100">
-              <div class="h-75">
-                <v-img
-                  :src="testimonial.image"
-                  class="rounded-lg ml-3"
-                  cover
-                  aspect-ratio="1/1"
-                />
-              </div>
-            </div>
+          <v-col cols="5" class="fill-height pa-0" >
+            <v-img
+              :src="testimonial.image"
+              class="rounded-lg ma-3"
+              cover
+              aspect-ratio="1/1"
+            />
+
           </v-col>
           <v-col cols="7">
             <div class="pa-5">
@@ -54,17 +51,18 @@ const testimonials = [
   {
     image: "/images/prof1.jpg",
     quote:
-      "NillTech has been instrumental in helping us find reliable developers for our projects. The escrow system gives us peace of mind, and the quality of work has been consistently excellent.",
+      "NillTech helps us find reliable developers with confidence. The escrow system is secure, and the work quality is consistently excellent.",
     name: "Alice Njeri",
-    role: "SME Owner:",
+    role: "SME Owner",
   },
   {
     image: "/images/prof2.jpg",
     quote:
-      "As a freelancer, NillTech provides me with steady work opportunities and guaranteed payments. The platform is transparent, professional, and I always get paid on time through their secure system.",
+      "NillTech gives me steady freelance work and reliable, on-time payments. The platform is professional, transparent, and secure.",
     name: "James Omondi",
     role: "Full-Stack Developer",
   },
+
 ];
 </script>
 
